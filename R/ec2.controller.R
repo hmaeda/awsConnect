@@ -258,7 +258,14 @@ describe.instances <- function(region){
 
   res <- system(cmd, intern = TRUE)
   if (length(res) > 0) {
-    res <- t(matrix(unlist(strsplit(res, "\t")), ncol = length(res)))
+    res <- do.call(rbind,lapply(res,function(y){
+      x <- strsplit(y,split='\t')[[1]]
+      if(length(x)<8){
+        c(x,rep("None",8-length(x)))
+      } else {
+        x
+      }
+    }))
     colnames(res) <- c("LaunchTime", "InstanceId", "State.Name", "AvailabilityZone", "RootDeviceType", 
                        "RootDeviceName", "KeyName", "PublicDnsName")
   } else res <- "No instance is available."
@@ -278,7 +285,14 @@ instances.from.reservation <- function(reservation.id, region, verbose=FALSE){
     print(cmd)
   }
   res <- system(cmd, intern = TRUE)
-  res <- t(matrix(unlist(strsplit(res, "\t")), ncol = length(res)))
+  res <- do.call(rbind,lapply(res,function(y){
+    x <- strsplit(y,split='\t')[[1]]
+    if(length(x)<4){
+      c(x,rep("None",4-length(x)))
+    } else {
+      x
+    }
+  }))
   res <- cbind(reservation.id, res)
   colnames(res) <- c("reservationId","LaunchTime", "InstanceId", "State.Name", "PublicDnsName")
   return(res)
